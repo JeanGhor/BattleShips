@@ -1,7 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "Fire.c"
+#include "RadarSweep.c"
+#include "SmokeScreen.c"
+#include "Artillery.c"
+#include "Torpedo.c"
 
 int calculateProb(int** pTable,int** grid);
+void highestProb(int** pTable, int* index);
+void possibleDirection(int* direction, int i, int j);
 
 int hardBot (int** grid, int** fgrid, int* weapons, int** Boats)
 {
@@ -73,14 +80,73 @@ void highestProb(int** pTable, int* index){
     }
 }
 
-void hitAround(int** pTable, int** grid, int i, int j){
-    
+void hitAround(int** pTable, int** grid, int i, int j, int* direction){
+    possibleDirection(direction, i, j);
+    int size = 0;
+    for(int k = 0; k < 4; k++){
+        if (direction[k] == 1)
+            size++;
+    }
+    int** correctDirection = (int**) malloc (size * sizeof(int*));
+    for (int k = 0; k < size; k++){
+        correctDirection[k] = (int*) malloc (2 * sizeof(int));
+    }
+    int index = 0;
+    for(int k = 0; k < 4; k++){
+        if (direction[k] == 1){
+            switch (k)
+            {
+            case 0:
+                correctDirection[index][0] = i - 1;
+                correctDirection[index][1] =  j;
+                break;
+            case 1:
+                correctDirection[index][0] = i;
+                correctDirection[index][1] =  j + 1;
+                break;
+            case 2:
+                correctDirection[index][0] = i + 1;
+                correctDirection[index][1] =  j;
+                break;
+            case 3:
+                correctDirection[index][0] = i;
+                correctDirection[index][1] =  j - 1;
+                break;
+            default:
+                break;
+            }
+            index++;
+        }
+    }
+    int* position = (int*) malloc (2 * sizeof(int));
+    int maxi = pTable[correctDirection[0][0]][correctDirection[0][1]];
+    position[0] = correctDirection[0][0];
+    position[1] = correctDirection[0][1];
+    for(int k = 1; k < size; k++){
+        if (pTable[correctDirection[k][0]][correctDirection[k][1]] > maxi){
+            maxi = pTable[correctDirection[k][0]][correctDirection[k][1]];
+            position[0] = correctDirection[k][0];
+            position[1] = correctDirection[k][1];
+        }
+    }
+    Fire(grid, position[0], position[1]);
+}
+
+void possibleDirection(int* direction, int i, int j){
+    if (!(i - 1 >= 0 ))
+        direction[0] = 0;
+    if (!(j + 1 < 10))
+        direction[1] = 0;
+    if (!(i + 1 < 10))
+        direction[2] = 0;
+    if (!(j - 1 >= 0))
+        direction[3] = 0;
 }
 
 int main()
 {
     int* weapons = {0};
-    int** grid =(int**) malloc (10*sizeof(int*));
+    int** grid =(int**) malloc (10 * sizeof(int*));
     int* index = (int*) malloc (3 * sizeof(int));
     for (int i = 0; i < 3; i++){
         index[i] = 0;
