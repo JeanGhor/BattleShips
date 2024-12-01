@@ -100,7 +100,7 @@ int hardBot (int difficult){
     int j;
     int gameover = 0;
     int count = 0;
-    int sunkBoats = 0;
+    int smokeBoat = 1;
     int** found = (int**) malloc (4 * sizeof(int*));
     for(int k = 0; k < 4; k++){
         found[k] = (int*) malloc (2 * sizeof(int));
@@ -124,8 +124,19 @@ int hardBot (int difficult){
             highestProb(pTable, index);
             i = index[0];
             j = index[1];
-            printf("%d %d\n", i, j);
-            if (count == 3  && weapons2[0] > 0){
+            printf("%d %d", Boats2[0][0] / 10, Boats2[0][0] % 10);
+            if (weapons2[1] > 0 && grid2[Boats2[0][0] / 10][Boats2[0][0] % 10] == 1){
+                SmokeScreenBot(grid2, weapons2, Boats2[0][0] / 10, Boats2[0][0] % 10);
+                printf("Smoke Screen 2");
+            }
+            else if (weapons2[1] > 0 && grid2[Boats2[1][0] / 10][Boats2[1][0] % 10] == 1)
+                SmokeScreenBot(grid2, weapons2, Boats2[1][0] / 10, Boats2[1][0] % 10);
+            else if (weapons2[1] > 0 && grid2[Boats2[2][0] / 10][Boats2[2][0] % 10] == 1)
+                SmokeScreenBot(grid2, weapons2, Boats2[2][0] / 10, Boats2[2][0] % 10);
+            else if (weapons2[1] > 0 && grid2[Boats2[3][0] / 10][Boats2[3][0] % 10] == 1)
+                SmokeScreenBot(grid2, weapons2, Boats2[3][0] / 10, Boats2[3][0] % 10);
+            else if (count >= 3  && weapons2[0] > 0 && i != 9 && j != 9){
+                printf("%d %d\n", i, j);
                 if(RadarSweepBot(grid1, weapons2, i, j, found)){
                     found[0][0] = i;
                     found[0][1] = j;
@@ -140,6 +151,7 @@ int hardBot (int difficult){
                 count = 0;
             }
             else{
+                printf("%d %d\n", i, j);
                 Fire(grid1, i, j);
                 if (grid1[i][j] == 2){
                     store[0] = i;
@@ -238,6 +250,7 @@ int hardBot (int difficult){
                 }
             }
             else{
+                weapons2[1]++;
                 hit = 0;
                 for(int i = 0; i < 4; i++){
                     direction[i] = 1;
