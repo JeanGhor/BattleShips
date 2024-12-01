@@ -1,3 +1,5 @@
+//Requires: Inputs should be in the form specified by the program
+//Effects: Leads a two player mode game guided step by step
 void twoplayermode(int difficult){
 // Create a grid for each player
     int**grid1=(int**)malloc(10*sizeof(int));
@@ -89,7 +91,8 @@ void twoplayermode(int difficult){
             gameover=1;
             break;
         }
-      
+        //system("pause");
+        //system("cls");
         printf("%s, it's your turn.\n",secondplayer);
         play(grid1,grid2, weapons2, Boats1, difficult, secondplayer);
         if(check_win(grid1)==1)
@@ -98,6 +101,7 @@ void twoplayermode(int difficult){
             gameover=1;
             break;
         }
-      
+        //system("pause");
+        //system("cls");
     }
 }
