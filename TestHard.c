@@ -13,7 +13,7 @@ int position_boat(int** grid, int col, int row, char direction, int boat, int** 
 void addboat(char*boat, int cells, int**grid, int** Boats);
 int check_win(int**grid);
 void print_opponent_grid(int**grid, int difficult);
-int hit_or_miss(int** grid, int** Boats);
+int hit_or_miss(int** grid, int** Boats,int*weapons);
 void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char*player);
 void highestProb(int** pTable, int* index);
 int calculateProb(int** pTable,int** grid);
@@ -98,6 +98,12 @@ int hardBot (int difficult){
     }
     int i;
     int j;
+    int maxrow=0;
+    int maxcol=0;
+    int torpedoTargetV;
+    int torpedoTargetH;
+
+    int dummy;
     int gameover = 0;
     while(gameover == 0)
     {
@@ -109,21 +115,22 @@ int hardBot (int difficult){
             break;
         }
         if (hit == 0){
-            calculateProb(pTable, grid1);
-            highestProb(pTable, index);
-            i = index[0];
-            j = index[1];
-            printf("%d %d\n", i, j);
-            Fire(grid1, i, j);
-            if (grid1[i][j] == 2){
-                store[0] = i;
-                store[1] = j;
-                hit = 1;
-            }
+
+                calculateProb(pTable, grid1);
+                highestProb(pTable, index);
+                i = index[0];
+                j = index[1];
+                printf("%d %d\n", i, j);
+                Fire(grid1, i, j);
+                if (grid1[i][j] == 2){
+                   store[0] = i;
+                   store[1] = j;
+                    hit = 1;
+                }
         }
         else{
             int read = 1;
-            if (!hit_or_miss(grid1, Boats1)){
+            if (!hit_or_miss(grid1,Boats1,weapons2)){
                 if(isInBounds(i, j - 1) && direction[0] && (grid1[i][j - 1] == 0 || grid1[i][j - 1] == 1 || grid1[i][j - 1] == 2 || grid1[i][j - 1] == 4)){
                     for(int k = 1; isInBounds(i, j - k) && grid1[i][j - k] != 3; k++){
                         if (grid1[i][j - k] != 2){
@@ -173,11 +180,53 @@ int hardBot (int difficult){
                 i = index[0];
                 j = index[1];
                 printf("%d %d\n", i, j);
-                Fire(grid1, i, j);
-                if (grid1[i][j] == 2){
-                    store[0] = i;
-                    store[1] = j;
-                    hit = 1;
+                if(weapons2[3]==3)
+                {
+                     for(int i=0;i<10;i++)
+                    {
+                         printf("\n");
+                     }
+                     for (int x=0;x<10;x++)
+                     {
+                        dummy=0;
+                        for(int y=0;y<10;y++)
+                        {
+                           if (grid1[x][y]==0||grid1[x][y]==1||grid1[x][y]==4)
+                               dummy++;
+                        }   
+                        if(maxrow<dummy)
+                        {
+                            maxrow=dummy;
+                            torpedoTargetH=x;
+                         }
+                     }
+                    for (int x=0;x<10;x++)
+                    {
+                        dummy=0;
+                        for(int y=0;y<10;y++)
+                        {
+                            if (grid1[y][x]==0||grid1[y][x]==1||grid1[y][x]==4)
+                                dummy++;
+                       }
+                        if(dummy>maxcol)
+                        {
+                            maxcol=dummy;
+                            torpedoTargetV=x;
+                        }
+                    }
+                    if(maxrow>maxcol)
+                        TorpedoBot(grid1,weapons2,1,torpedoTargetH);
+                    else
+                        TorpedoBot(grid1,weapons2,0,torpedoTargetV);
+                    }
+                    else
+                    {
+                        Fire(grid1, i, j);
+                        if (grid1[i][j] == 2){
+                         store[0] = i;
+                         store[1] = j;
+                         hit = 1;
+                    }
                 }
             }
         }
@@ -396,7 +445,7 @@ void print_opponent_grid(int**grid, int difficult){
     printf("\n");
 }
 
-int hit_or_miss(int** grid, int** Boats){
+int hit_or_miss(int** grid, int** Boats,int* weapons){
     for (int i = 0; i < 4; i++){
         for (int j = 0; j<i+2; j++){  
             if(Boats[i][j]>=0)
@@ -421,6 +470,16 @@ int hit_or_miss(int** grid, int** Boats){
             for (int j = 0; j < i + 2; j++){
                 Boats[i][j] = -2;
             }
+        }
+        if(sunk)
+        {
+            weapons[1]++;
+            weapons[2]++;
+            weapons[3]++;
+        }
+        else
+        {
+            weapons[2]=0;
         }
     }
     return sunk;
@@ -552,13 +611,7 @@ void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char
         break;
     }
     print_opponent_grid(grid, difficult);
-    weapons[2] = 0;
-    int sunk = hit_or_miss(grid, Boats);
-    weapons[1] += sunk;
-    weapons[3] += sunk;
-    if(sunk > 0){
-        weapons[2] = 1;
-    }
+    int sunk = hit_or_miss(grid, Boats,weapons);
     printf("\n%d boats were sunk", sunk);
     printf("\nNext player turn...");
 }
