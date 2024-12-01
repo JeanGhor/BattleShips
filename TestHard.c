@@ -125,7 +125,8 @@ int hardBot (int difficult){
             i = index[0];
             j = index[1];
             printf("%d %d\n", i, j);
-            if (count == 3  && weapons2[0] > 0){
+            if (count >= 3  && weapons2[0] > 0 && i != 9 && j != 9){
+                printf("%d\n", weapons2[0]);
                 if(RadarSweepBot(grid1, weapons2, i, j, found)){
                     found[0][0] = i;
                     found[0][1] = j;
