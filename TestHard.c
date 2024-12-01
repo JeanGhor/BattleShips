@@ -13,7 +13,7 @@ int position_boat(int** grid, int col, int row, char direction, int boat, int** 
 void addboat(char*boat, int cells, int**grid, int** Boats);
 int check_win(int**grid);
 void print_opponent_grid(int**grid, int difficult);
-int hit_or_miss(int** grid, int** Boats);
+int hit_or_miss(int** grid, int** Boats,int*weapons);
 void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char*player);
 void highestProb(int** pTable, int* index);
 int calculateProb(int** pTable,int** grid);
@@ -30,7 +30,7 @@ int RadarSweepBot(int** Grid, int weapons[], int row, int col,int**found);
 
 int hardBot (int difficult){
     int weapons1[] = {3, 0, 0, 0};
-    int weapons2[] = {3, 0, 0, 0};
+    int weapons2[] = {3, 0, 0, 3};
     char player[20];
     printf("\nEnter your name: ");
     scanf("%s", &player);
@@ -92,24 +92,15 @@ int hardBot (int difficult){
     int* index = (int*) malloc (3 * sizeof(int));
     int hit = 0;
     int* store = (int*) malloc (2 * sizeof(int));
-    int* direction = (int*) malloc (4 * sizeof(int));
-    for(int i = 0; i < 4; i++){
-        direction[i] = 1;
-    }
     int i;
     int j;
+    int maxrow=0;
+    int maxcol=0;
+    int torpedoTargetV;
+    int torpedoTargetH;
+
+    int dummy;
     int gameover = 0;
-    int count = 0;
-    int sunkBoats = 0;
-    int** found = (int**) malloc (4 * sizeof(int*));
-    for(int k = 0; k < 4; k++){
-        found[k] = (int*) malloc (2 * sizeof(int));
-    }
-    for(int k = 0; k < 4; k++){
-        for(int l = 0; l < 2; l++){
-            found[k][l] = -1;
-        }
-    }
     while(gameover == 0)
     {
         play(grid2,grid1,weapons1,Boats2,difficult,player);
@@ -119,87 +110,105 @@ int hardBot (int difficult){
             gameover = 1;
             break;
         }
-        if (hit == 0){
-            calculateProb(pTable, grid1);
-            highestProb(pTable, index);
-            i = index[0];
-            j = index[1];
-            printf("%d %d\n", i, j);
-            if (count >= 3  && weapons2[0] > 0 && i != 9 && j != 9){
-                printf("%d\n", weapons2[0]);
-                if(RadarSweepBot(grid1, weapons2, i, j, found)){
-                    found[0][0] = i;
-                    found[0][1] = j;
-                    found[1][0] = i;
-                    found[1][1] = j + 1; 
-                    found[2][0] = i + 1;
-                    found[2][1] = j;
-                    found[3][0] = i + 1;
-                    found[3][1] = j + 1;
-                    hit = 1;
+        if(weapons2[3]==3)
+            {
+                printf("\nTorpedo\n");
+                for (int x=0;x<10;x++)
+                {
+                    dummy=0;
+                    for(int y=0;y<10;y++)
+                    {
+                        if (grid1[x][y]==0||grid1[x][y]==1||grid1[x][y]==4)
+                           dummy++;
+                    }
+                    if(maxrow<dummy)
+                    {
+                        maxrow=dummy;
+                        torpedoTargetH=x;
+                    }
                 }
-                count = 0;
+                for (int x=0;x<10;x++)
+                {
+                    dummy=0;
+                    for(int y=0;y<10;y++)
+                    {
+                        if (grid1[y][x]==0||grid1[y][x]==1||grid1[y][x]==4)
+                            dummy++;
+                    }
+                    if(dummy>maxcol)
+                    {
+                        maxcol=dummy;
+                        torpedoTargetV=x;
+                    }
+                }
+                if(maxrow>maxcol)
+                {
+                    z=TorpedoBot(grid1,weapons2,1,torpedoTargetH);
+                    if(z)
+                    {
+                        if(!hit_or_miss(grid1,Boats1,weapons2))
+                        {
+                            hit=1;
+                        }
+                        for(int khalas = 0 ; khalas<10;khalas++)
+                        {
+                            if (grid1[torpedoTargetH][khalas]==2)
+                            {
+                                j=torpedoTargetH;
+                                i=khalas;
+                                store[0]=i;
+                                store[1]=j;
+                                printf("\n\n\n\n\n %d %d", i,j);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    z=TorpedoBot(grid1,weapons2,0,torpedoTargetV);
+                    if(z)
+                    {
+                        if(!hit_or_miss(grid1,Boats1,weapons2))
+                        {
+                            hit=1;
+                        }
+                        for(int khalas = 0 ; khalas<10;khalas++)
+                        {
+                            if (grid1[khalas][torpedoTargetV]==2)
+                            {
+                                i=khalas;
+                                j=torpedoTargetV;
+                                printf("\n\n\n\n\n %d %d", i,j);
+                            }
+                        }
+                    }
+                }
+                store[0]=i;
+                store[1]=j;
+                printf("\n \n \n \n %d \n \n \n \n",hit);
             }
-            else{
+        else if (hit == 0)
+        {
+                printf("\npTable\n");
+                calculateProb(pTable, grid1);
+                highestProb(pTable, index);
+                i = index[0];
+                j = index[1];
+                printf("%d %d\n", i, j);
                 Fire(grid1, i, j);
-                if (grid1[i][j] == 2){
-                    store[0] = i;
-                    store[1] = j;
+                if (grid1[i][j] == 2)
+                {
+                   store[0] = i;
+                   store[1] = j;
                     hit = 1;
                 }
-                count++;
-            }
         }
         else{
+            printf("\nsearch around\n");
             int read = 1;
-            if (!hit_or_miss(grid1, Boats1)){
-                count = 0;
-                if(found[0][0] != -1 && found[0][1] != -1 && read && !(grid1[found[0][0]][found[0][1]] == 2) && !(grid1[found[0][0]][found[0][1]] == 3)){
-                    if (FireBot(grid1, found[0][0], found[0][1])){
-                        i = found[0][0];
-                        j = found[0][1];
-                        store[0] = i;
-                        store[1] = j;
-
-                    }
-                    found[0][0] = -1;
-                    found[0][1] = -1;
-                    read = 0;
-                }
-                if(found[1][0] != -1 && found[1][1] != -1 && read && !(grid1[found[1][0]][found[1][1]] == 2) && !(grid1[found[1][0]][found[1][1]] == 3)){
-                    if (Fire(grid1, found[1][0], found[1][1])){
-                        i = found[1][0];
-                        j = found[1][1];
-                        store[0] = i;
-                        store[1] = j;
-                    }
-                    found[1][0] = -1;
-                    found[1][1] = -1;
-                    read = 0;
-                }
-                if(found[2][0] != -1 && found[2][1] != -1 && read && !(grid1[found[2][0]][found[2][1]] == 2) && !(grid1[found[2][0]][found[2][1]] == 3)){
-                    if (Fire(grid1, found[2][0], found[2][1])){
-                        i = found[2][0];
-                        j = found[2][1];
-                        store[0] = i;
-                        store[1] = j;
-                    }
-                    found[2][0] = -1;
-                    found[2][1] = -1;
-                    read = 0;
-                }
-                if(found[3][0] != -1 && found[3][1] != -1 && read && !(grid1[found[3][0]][found[3][1]] == 2) && !(grid1[found[3][0]][found[3][1]] == 3)){
-                    if (Fire(grid1, found[3][0], found[3][1])){
-                        i = found[3][0];
-                        j = found[3][1];
-                        store[0] = i;
-                        store[1] = j;
-                    }
-                    found[3][0] = -1;
-                    found[3][1] = -1;
-                    read = 0;
-                }
-                if(isInBounds(i, j - 1) && direction[0] && (grid1[i][j - 1] == 0 || grid1[i][j - 1] == 1 || grid1[i][j - 1] == 2 || grid1[i][j - 1] == 4) && read){
+            if (!hit_or_miss(grid1,Boats1,weapons2)){
+                printf("%d",isInBounds(i,j-1));
+                if(isInBounds(i, j - 1) && (grid1[i][j - 1] == 0 || grid1[i][j - 1] == 1 || grid1[i][j - 1] == 2 || grid1[i][j - 1] == 4)){
                     for(int k = 1; isInBounds(i, j - k) && grid1[i][j - k] != 3; k++){
                         if (grid1[i][j - k] != 2){
                             Fire(grid1, i, j - k);
@@ -208,8 +217,7 @@ int hardBot (int difficult){
                         }
                     }
                 }
-                if(isInBounds(i - 1, store[1]) && direction[1] && (grid1[i - 1][store[1]] == 0 || grid1[i - 1][store[1]] == 1 || grid1[i - 1][store[1]] == 2 || grid1[i - 1][store[1]] == 4) && read){
-                   direction[0] = 0;
+                if(isInBounds(i - 1, store[1]) &&  (grid1[i - 1][store[1]] == 0 || grid1[i - 1][store[1]] == 1 || grid1[i - 1][store[1]] == 2 || grid1[i - 1][store[1]] == 4) && read){
                     for(int k = 1; isInBounds(i - k, j) && grid1[i - k][j] != 3; k++){
                         if (grid1[i - k][j] != 2){
                             Fire(grid1, i - k, j);
@@ -218,8 +226,8 @@ int hardBot (int difficult){
                         }
                     }
                 }
-                if(isInBounds(store[0], j + 1) && direction[2] && (grid1[store[0]][j + 1] == 0 || grid1[store[0]][j + 1] == 1 || grid1[store[0]][j + 1] == 2 || grid1[store[0]][j + 1] == 4) && read){
-                    direction[1] = 0;
+                if(isInBounds(store[0], j + 1) && (grid1[store[0]][j + 1] == 0 || grid1[store[0]][j + 1] == 1 || grid1[store[0]][j + 1] == 2 || grid1[store[0]][j + 1] == 4) && read){
+                    printf("3");
                     for(int k = 1; isInBounds(i, j + k) && grid1[i][j + k] != 3; k++){
                         if (grid1[i][j + k] != 2){
                             Fire(grid1, i, j + k);
@@ -228,8 +236,8 @@ int hardBot (int difficult){
                         }
                     }
                 }
-                if(isInBounds(i + 1, store[1]) && direction[3] && (grid1[i + 1][store[1]] == 0 || grid1[i + 1][store[1]] == 1 || grid1[i + 1][store[1]] == 2 || grid1[i + 1][store[1]] == 4) && read){
-                   direction[2] = 0;
+                if(isInBounds(i + 1, store[1]) && (grid1[i + 1][store[1]] == 0 || grid1[i + 1][store[1]] == 1 || grid1[i + 1][store[1]] == 2 || grid1[i + 1][store[1]] == 4) && read){
+                   printf("4");
                     for(int k = 1; isInBounds(i + k, j) && grid1[i + k][j] != 3; k++){
                         if (grid1[i + k][j] != 2){
                             Fire(grid1, i + k, j);
@@ -240,9 +248,7 @@ int hardBot (int difficult){
             }
             else{
                 hit = 0;
-                for(int i = 0; i < 4; i++){
-                    direction[i] = 1;
-                }
+
                 calculateProb(pTable, grid1);
                 highestProb(pTable, index);
                 i = index[0];
@@ -254,8 +260,13 @@ int hardBot (int difficult){
                     store[1] = j;
                     hit = 1;
                 }
-                count++;
             }
+        }
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 10; j++){
+                printf("%d ", pTable[i][j]);
+            }
+            printf("\n");
         }
         print_opponent_grid(grid1, difficult);
         if(check_win(grid1) == 1){
@@ -466,7 +477,7 @@ void print_opponent_grid(int**grid, int difficult){
     printf("\n");
 }
 
-int hit_or_miss(int** grid, int** Boats){
+int hit_or_miss(int** grid, int** Boats,int* weapons){
     for (int i = 0; i < 4; i++){
         for (int j = 0; j<i+2; j++){  
             if(Boats[i][j]>=0)
@@ -491,6 +502,16 @@ int hit_or_miss(int** grid, int** Boats){
             for (int j = 0; j < i + 2; j++){
                 Boats[i][j] = -2;
             }
+        }
+        if(sunk)
+        {
+            weapons[1]++;
+            weapons[2]++;
+            weapons[3]++;
+        }
+        else
+        {
+            weapons[2]=0;
         }
     }
     return sunk;
@@ -567,7 +588,8 @@ void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char
             c1 = String[size - 3];
             row = 9;
         }
-        else{
+        else
+        {
             c1 = String[size - 2];
             c2 = String[size - 1];
             row = (int)(c2) - (int)('1');
@@ -621,13 +643,7 @@ void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char
         break;
     }
     print_opponent_grid(grid, difficult);
-    weapons[2] = 0;
-    int sunk = hit_or_miss(grid, Boats);
-    weapons[1] += sunk;
-    weapons[3] += sunk;
-    if(sunk > 0){
-        weapons[2] = 1;
-    }
+    int sunk = hit_or_miss(grid, Boats,weapons);
     printf("\n%d boats were sunk", sunk);
     printf("\nNext player turn...");
 }
@@ -689,7 +705,6 @@ int calculateProb(int** pTable,int** grid)
         }
     }
 }
-
 
 void SetUp(int x, int** templates){// !!!!!!!!this function's array should be plased in the main!!!!!!!!!!{
     if (x == 0){
@@ -867,7 +882,8 @@ int FireBot(int** Grid, int row, int col){
         Grid[row][col] = 2; //shot and hits a boat
         return 1;
     }
-    else{
+    else
+    {
         printf("miss\n");
         Grid[row][col] = 3; //shot and miss a boat
         return 0;
@@ -913,6 +929,7 @@ int SmokeScreenBot(int** Grid, int* weapons, int row, int col){
 }
 int TorpedoBot(int** Grid, int weapons[], int isrow, int roworcolumn){
     int count = 0; //we will us it to check if they hit a boat
+    weapons[3]=0;
     if(isrow)
     { //The row "roworcolumn" will be hit
         for(int i = 0; i < 10; i++)
