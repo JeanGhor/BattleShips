@@ -30,7 +30,7 @@ int RadarSweepBot(int** Grid, int weapons[], int row, int col,int**found);
 
 int hardBot (int difficult){
     int weapons1[] = {3, 0, 0, 0};
-    int weapons2[] = {3, 0, 1, 0};
+    int weapons2[] = {3, 0, 0, 0};
     char player[20];
     printf("\nEnter your name: ");
     scanf("%s", &player);
@@ -102,6 +102,11 @@ int hardBot (int difficult){
     int savej;
     int dummy;
     int gameover = 0;
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            pTable[i][j] = 0;
+        }
+    }
     int** found = (int**) malloc (4 * sizeof(int*));
     for(int k = 0; k < 4; k++){
         found[k] = (int*) malloc (2 * sizeof(int));
@@ -123,8 +128,8 @@ int hardBot (int difficult){
         if(weapons2[2]>0)
         {
             printf("\nArtillery\n");
-            calculateProb(pTable,grid1);
             maxrow=0;
+            calculateProb(pTable,grid1);
             for (int i =0; i<9;i++)
             {
                 for (int j=0;j<9;j++)
@@ -136,16 +141,14 @@ int hardBot (int difficult){
                         savei=i;
                         savej=j;
                     }
-                    printf("dummy:%d i:%d j:%d\n",dummy,i,j);
-
                     dummy=0;
                 }
             }
-            printf("%d %d\n",savei,savej);
             if(ArtilleryBot(grid1,weapons2,savei,savej))
             {
                 hit=1;
-                calculateProb(pTable,grid1);
+
+
                 if(grid1[savei][savej]==2)
                 {
                     found[0][0]=savei;
@@ -177,7 +180,6 @@ int hardBot (int difficult){
                     store[1]=found[i][1];
                 }
             }
-            printf("found: %d %d",store[0],store[1]);
             i=store[0];
             j=store[1];
             dummy=0;
