@@ -1,6 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
-
+#include <stdlib.h>
 int main(){
 srand(time(NULL));
 char difficulty[5];
@@ -24,15 +23,10 @@ else{
     int level;
     printf("How smart do you want your enemy to be? (Level 1, 2, or 3)\n");
     scanf("%d", &level);
-    if(level==1){
-        easy(difficult);
-    }
-    else if(level==2){
+    if(level==2){
         medium(difficult);
     }
-    else{
-        hard(difficult);
-    }
   
+
 }
 }
