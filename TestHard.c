@@ -114,7 +114,46 @@ int hardBot (int difficult){
             gameover = 1;
             break;
         }
-        if (hit == 0){
+        if(weapons2[3]==3)
+                {
+                     for(int i=0;i<10;i++)
+                    {
+                         printf("\n");
+                     }
+                     for (int x=0;x<10;x++)
+                     {
+                        dummy=0;
+                        for(int y=0;y<10;y++)
+                        {
+                           if (grid1[x][y]==0||grid1[x][y]==1||grid1[x][y]==4)
+                               dummy++;
+                        }   
+                        if(maxrow<dummy)
+                        {
+                            maxrow=dummy;
+                            torpedoTargetH=x;
+                         }
+                     }
+                    for (int x=0;x<10;x++)
+                    {
+                        dummy=0;
+                        for(int y=0;y<10;y++)
+                        {
+                            if (grid1[y][x]==0||grid1[y][x]==1||grid1[y][x]==4)
+                                dummy++;
+                       }
+                        if(dummy>maxcol)
+                        {
+                            maxcol=dummy;
+                            torpedoTargetV=x;
+                        }
+                    }
+                    if(maxrow>maxcol)
+                        TorpedoBot(grid1,weapons2,1,torpedoTargetH);
+                    else
+                        TorpedoBot(grid1,weapons2,0,torpedoTargetV);
+                    }
+        else if (hit == 0){
 
                 calculateProb(pTable, grid1);
                 highestProb(pTable, index);
@@ -130,7 +169,7 @@ int hardBot (int difficult){
         }
         else{
             int read = 1;
-            if (!hit_or_miss(grid1,Boats1,weapons2)){
+             if (!hit_or_miss(grid1,Boats1,weapons2)){
                 if(isInBounds(i, j - 1) && direction[0] && (grid1[i][j - 1] == 0 || grid1[i][j - 1] == 1 || grid1[i][j - 1] == 2 || grid1[i][j - 1] == 4)){
                     for(int k = 1; isInBounds(i, j - k) && grid1[i][j - k] != 3; k++){
                         if (grid1[i][j - k] != 2){
@@ -180,53 +219,11 @@ int hardBot (int difficult){
                 i = index[0];
                 j = index[1];
                 printf("%d %d\n", i, j);
-                if(weapons2[3]==3)
-                {
-                     for(int i=0;i<10;i++)
-                    {
-                         printf("\n");
-                     }
-                     for (int x=0;x<10;x++)
-                     {
-                        dummy=0;
-                        for(int y=0;y<10;y++)
-                        {
-                           if (grid1[x][y]==0||grid1[x][y]==1||grid1[x][y]==4)
-                               dummy++;
-                        }   
-                        if(maxrow<dummy)
-                        {
-                            maxrow=dummy;
-                            torpedoTargetH=x;
-                         }
-                     }
-                    for (int x=0;x<10;x++)
-                    {
-                        dummy=0;
-                        for(int y=0;y<10;y++)
-                        {
-                            if (grid1[y][x]==0||grid1[y][x]==1||grid1[y][x]==4)
-                                dummy++;
-                       }
-                        if(dummy>maxcol)
-                        {
-                            maxcol=dummy;
-                            torpedoTargetV=x;
-                        }
-                    }
-                    if(maxrow>maxcol)
-                        TorpedoBot(grid1,weapons2,1,torpedoTargetH);
-                    else
-                        TorpedoBot(grid1,weapons2,0,torpedoTargetV);
-                    }
-                    else
-                    {
-                        Fire(grid1, i, j);
-                        if (grid1[i][j] == 2){
-                         store[0] = i;
-                         store[1] = j;
-                         hit = 1;
-                    }
+                Fire(grid1, i, j);
+                if (grid1[i][j] == 2){
+                    store[0] = i;
+                    store[1] = j;
+                    hit = 1;
                 }
             }
         }
@@ -897,6 +894,7 @@ int SmokeScreenBot(int** Grid, int* weapons, int row, int col){
 }
 int TorpedoBot(int** Grid, int weapons[], int isrow, int roworcolumn){
     int count = 0; //we will us it to check if they hit a boat
+    weapons[3]=0;
     if(isrow)
     { //The row "roworcolumn" will be hit
         for(int i = 0; i < 10; i++)
