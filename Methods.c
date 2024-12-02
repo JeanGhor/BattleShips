@@ -404,8 +404,7 @@ int check_win(int**grid)
 //does not show outcome if the cell was hidden by smoke screen
 //Testing strategy: Pass a grid that has every element possible (misses, hits, undiscoverd, undiscovered with a boat, and smokescreen)
 //with both difficulties.
-void print_opponent_grid(int**grid, int difficult)
-{
+void print_opponent_grid(int**grid, int difficult){
     printf("\n    ");
     for (int i=0; i<10; i++)
     {
@@ -416,7 +415,7 @@ void print_opponent_grid(int**grid, int difficult)
         printf("\n%d   ", i);
         for(int j=0; j<10; j++)
         {
-            if(grid[i-1][j]==0||grid[i-1][j]==1)
+            if(grid[i-1][j]==0||grid[i-1][j]==1||grid[i-1][j]==4)
             {
                 printf("~   ");
             }
@@ -430,20 +429,17 @@ void print_opponent_grid(int**grid, int difficult)
                 {
                     printf("o   ");
                 }
-            else if(grid[i-1][j] == 4){
-                printf("~   ");
-            }
-            else
-            {
-                printf("~   ");
-            }
+                else
+                {
+                    printf("~   ");
+                }
             }
         }
     }
     printf("\n%d  ", 10);
     for(int j=0; j<10; j++)
     {
-        if(grid[9][j]==0||grid[9][j]==1)
+        if(grid[9][j]==0||grid[9][j]==1||grid[9][j]==4)
         {
             printf("~   ");
         }
@@ -463,8 +459,6 @@ void print_opponent_grid(int**grid, int difficult)
             }
         }
     }
-    printf("\n");
-    printf("\n");
     printf("\n");
 }
 
