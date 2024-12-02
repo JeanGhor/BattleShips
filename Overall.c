@@ -2,11 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "Fire.c"
-#include "RadarSweep.c"
-#include "SmokeScreen.c"
-#include "Artillery.c"
-#include "Torpedo.c"
+#include "Weapons.c"
 
 void printgrid(int** grid);
 int position_boat(int** grid, int col, int row, char direction, int boat, int** Boats);
@@ -99,16 +95,19 @@ void twoplayermode(int difficult){
     addboat("battleship", 4, grid1, Boats1);
     addboat("destroyer", 3, grid1, Boats1);
     addboat("submarine", 2, grid1, Boats1);
-  
+    
 
     printf("\n%s, all your boats are positioned.\n%s, it is your turn to enter yours.", firstplayer, secondplayer);
+    system("pause");
+    system("cls");
+
     print_opponent_grid(grid2, difficult);
     addboat("carrier", 5, grid2, Boats2);
     addboat("battleship", 4, grid2, Boats2);
     addboat("destroyer", 3, grid2, Boats2);
     addboat("submarine", 2, grid2, Boats2);
-    //system("pause");
-    //system("cls");
+    system("pause");
+    system("cls");
 
     int weapons1[] = {3, 0, 0, 0};
     int weapons2[] = {3, 0, 0, 0};
@@ -123,7 +122,9 @@ void twoplayermode(int difficult){
             gameover=1;
             break;
         }
-      
+        system("pause");
+        system("cls");
+
         printf("%s, it's your turn.\n",secondplayer);
         play(grid1,grid2, weapons2, Boats1, difficult, secondplayer);
         if(check_win(grid1)==1)
@@ -132,7 +133,8 @@ void twoplayermode(int difficult){
             gameover=1;
             break;
         }
-      
+        system("pause");
+        system("cls");
     }
 }
 
@@ -145,6 +147,9 @@ void easyBot(int difficult){
     printf("\nEnter your name: ");
     scanf("%s", &player);
     getchar();
+    system("pause");
+    system("cls");
+
     int**grid1=(int**)malloc(10*sizeof(int*));
     for(int i=0; i<10; i++){
         grid1[i]=(int*)malloc(10*sizeof(int));
@@ -182,7 +187,8 @@ void easyBot(int difficult){
     addboat("battleship", 4, grid1, Boats1);
     addboat("destroyer", 3, grid1, Boats1);
     addboat("submarine", 2, grid1, Boats1);
-
+    system("pause");
+    system("cls");
     robot_position_boat(5, Boats2, grid2);
     robot_position_boat(4, Boats2, grid2);
     robot_position_boat(3, Boats2,  grid2);
@@ -198,7 +204,13 @@ void easyBot(int difficult){
     int j;
     int gameover = 0;
     while(gameover == 0){
+        system("pause");
+        system("cls");
+
         play(grid2,grid1, weapons1, Boats2, difficult, player);
+        system("pause");
+        system("cls");
+
         if(check_win(grid2)==1){
             printf("%s won!", player);
             gameover=1;
@@ -336,6 +348,8 @@ addboat("carrier", 5, grid1, Boats1);
 addboat("battleship", 4, grid1, Boats1);
 addboat("destroyer", 3, grid1, Boats1);
 addboat("submarine", 2, grid1, Boats1);
+system("pause");
+system("cls");
 
 robot_position_boat(5, Boats2, grid2);
 robot_position_boat(4, Boats2, grid2);
@@ -349,7 +363,11 @@ int sunk=0;
 int gameover=0;
 
 while(gameover==0){
+    system("pause");
+    system("cls");
     play(grid2, grid1, weapons1, Boats1, difficult, player);
+    system("pause");
+    system("cls");
     if(check_win(grid2)==1){
         printf("You won, congrats!!");
         gameover=1;
@@ -938,6 +956,9 @@ void hardBot (int difficult){
     printf("\nEnter your name: ");
     scanf("%s", &player);
     getchar();
+    system("pause");
+    system("cls");
+
     int**grid1=(int**)malloc(10*sizeof(int));
     for(int i=0; i<10; i++)
     {
@@ -973,6 +994,8 @@ void hardBot (int difficult){
     addboat("battleship", 4, grid1, Boats1);
     addboat("destroyer", 3, grid1, Boats1);
     addboat("submarine", 2, grid1, Boats1);
+    system("pause");
+    system("cls");
 
     int z = rand() % 8;
     int** templates = (int**) malloc (4 * sizeof(int*));
@@ -1022,7 +1045,13 @@ void hardBot (int difficult){
     }
     while(gameover == 0)
     {
+        system("pause");
+        system("cls");
+
         play(grid2,grid1,weapons1,Boats2,difficult,player);
+        system("pause");
+        system("cls");
+
         if(check_win(grid2)==1)
         {
             printf("\nYou won, congrats!");
@@ -1623,7 +1652,11 @@ int hit_or_miss2(int** grid, int** Boats){
     }
     return 0;
 }
-
+//Requires: the grid entered should be the opponent's grid, the boats array should be the current player's array and the current player's weapons
+//Effects:  returns, if a boat was sunk in the last play, how many boats were sunk, and adjusts weapons accordingly
+//Testing Strategy: To test hit or miss, we try first an empty grid. After checking the normal behavior, we try it with
+//a grid where one boat was hit, a grid where the last cell of a boat was hit and we try a grid where 
+//the last cell of 2 boats were hit.
 
 int hit_or_miss3(int** grid, int** Boats,int* weapons){
     for (int i = 0; i < 4; i++){
@@ -1867,8 +1900,9 @@ int calculateProb(int** pTable,int** grid)
     }
 }
 
-
-void SetUp(int x, int** templates){// !!!!!!!!this function's array should be plased in the main!!!!!!!!!!{
+//Requires: an integer between 0 and 7 and a 2D array
+//Effects: returns specific places to place boats through the templates array
+void SetUp(int x, int** templates){
     if (x == 0){
         templates[0][0] = 0;
         templates[0][1] = 0;
@@ -1982,7 +2016,10 @@ void SetUp(int x, int** templates){// !!!!!!!!this function's array should be pl
         templates[3][2] = 0;   
     }
 }
-
+//Requires: the parameters should include the length of the boat, the array that stores the robot's boats and its grid and the choosen template's boat position
+//Effects: positions the boat in the robot's grid in at predefined coordinates depending on the template
+//Testing Strategy: We do not need to consider the possibility of the int boat being abnormal as we specify it
+//in the caller method. Same principle for Boats and grid, they are the responsability of the main method.
 void robot_position_boat_hard(int boat, int**Boats, int**grid, int *chosen){
     int col = chosen[0];
     int row = chosen[1];
