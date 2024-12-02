@@ -88,7 +88,7 @@ while(gameover==0){
     }
 
 
-    if(grid1[i][j]==2){
+    if(grid1[i][j]==2){ //if there is a miss, search around the cell
         int visited=0;
         play(grid2, grid1, weapons1, Boats1, difficult, player);
         if(check_win(grid2)==1){
@@ -96,17 +96,17 @@ while(gameover==0){
             gameover=1;
             break;
         }
-        if(j-1>=0){
-            Fire(grid1, i, j-1);
+        if(j-1>=0){ //makes sure that there is a cell to the left before firing
+            Fire(grid1, i, j-1); //fire the cell at the left
             print_opponent_grid(grid1, difficult);
             if(check_win(grid1)==1){
                 printf("You lost, better luck next time!");
                 gameover=1; 
                 break;
             }
-            if(grid1[i][j-1]==2){
+            if(grid1[i][j-1]==2){ //if the left cell is also a hit, search at right for a horizontal boat
                 visited=1;
-                if  (hit_or_miss2(grid1, Boats1)!=2){
+                if  (hit_or_miss2(grid1, Boats1)!=2){ //if the submarine was not sunk, keep firing
                     play(grid2, grid1, weapons1, Boats1, difficult, player);
                     if(check_win(grid2)==1){
                         printf("You won, congrats!!");
@@ -114,15 +114,15 @@ while(gameover==0){
                         break;
                     }
         
-                    Fire(grid1, i, j+1);
+                    Fire(grid1, i, j+1); //fire the cell at the right
                     print_opponent_grid(grid1, difficult);
                     if(check_win(grid1)==1){
                         printf("You lost, better luck next time!");
                         gameover=1; 
                         break;
                     }
-                    if(grid1[i][j+1]==2){
-                        if(hit_or_miss2(grid1, Boats1)!=3){
+                    if(grid1[i][j+1]==2){ 
+                        if(hit_or_miss2(grid1, Boats1)!=3){ //if the destroyer was not sunk, keep firing
                             play(grid2, grid1, weapons1, Boats1, difficult, player);
                             if(check_win(grid2)==1){
                                 printf("You won, congrats!!");
@@ -150,12 +150,12 @@ while(gameover==0){
                                     visited=0;
                                 }
                                 else {sunk++;
-                                    if(sunk==3){
+                                    if(sunk==3){ //if three boats were sunk, try torpedo
                                         play(grid2, grid1, weapons1, Boats1, difficult, player);
                                         if(check_win(grid2)==1){
                                             printf("You won, congrats!!");
                                             gameover=1;
-                                            break;
+                                            break; 
                                         }
                                         Torpedo(grid1, weapons2, 1, 9);
                                         weapons2[3]=0;
@@ -232,7 +232,7 @@ while(gameover==0){
                     }
             }
         } 
-        if(i-1>=0 && visited==0){
+        if(i-1>=0 && visited==0){ //if the cell at the left was a miss, fire the cell above if it is within boundaries
             Fire(grid1, i-1, j);
             print_opponent_grid(grid1, difficult);
             if(check_win(grid1)==1){
@@ -240,9 +240,9 @@ while(gameover==0){
                 gameover=1; 
                 break;
             }
-            if(grid1[i-1][j]==2){
+            if(grid1[i-1][j]==2){ //if the cell above was a hit, search below for a vertical boat until a boat is sunk
                 visited=1;
-                if(hit_or_miss2(grid1, Boats1)!=2){
+                if(hit_or_miss2(grid1, Boats1)!=2){ //if submarine was not sunk, keep firing
                     play(grid2, grid1, weapons1, Boats1, difficult, player);
                     if(check_win(grid2)==1){
                         printf("You won, congrats!!");
@@ -363,7 +363,7 @@ while(gameover==0){
 
             }
         }
-        if(j+1<=10 && visited==0){
+        if(j+1<=10 && visited==0){ 
             Fire(grid1, i, j+1);
             print_opponent_grid(grid1, difficult);
             if(check_win(grid1)==1){
@@ -632,7 +632,7 @@ while(gameover==0){
         j=j+2;
     }
 
-    j=j+x;
+    j=j+x; 
     if(j==10 && x==2){
         i=i+1;
         j=1;
