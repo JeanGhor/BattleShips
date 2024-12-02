@@ -1,7 +1,12 @@
 //Requires: Inputs should be in the form specified by the program
 // A boat cannot start right after the cell where another boat finishes
 //Effects: Leads a single player mode game against a medium level robot
-void medium(int difficult){
+//Testing Strategy: Trial and error approach, correct the code for each
+//abnormal behavior the bot can have. This way we can perfect the bot as 
+//we go by small adjustments and comits. No need to test the arguments there,
+//as we moderate it from the main method. Small things were consider like
+//out of bounds error and off by one error before starting the trail and error process.
+void mediumBot(int difficult){
 
 int weapons1[] = {3, 0, 0, 0};
 int weapons2[] = {3, 0, 0, 3};
@@ -9,6 +14,8 @@ char player[20];
 printf("\nEnter your name: ");
 scanf("%s", &player);
 getchar();
+system("pause");
+system("cls");
 
 int**grid1=(int**)malloc(10*sizeof(int));
     for(int i=0; i<10; i++)
@@ -48,6 +55,8 @@ addboat("carrier", 5, grid1, Boats1);
 addboat("battleship", 4, grid1, Boats1);
 addboat("destroyer", 3, grid1, Boats1);
 addboat("submarine", 2, grid1, Boats1);
+system("pause");
+system("cls");
 
 robot_position_boat(5, Boats2, grid2);
 robot_position_boat(4, Boats2, grid2);
@@ -62,6 +71,8 @@ int gameover=0;
 
 while(gameover==0){
     play(grid2, grid1, weapons1, Boats1, difficult, player);
+    system("pause");
+    system("cls");
     if(check_win(grid2)==1){
         printf("You won, congrats!!");
         gameover=1;
@@ -638,5 +649,7 @@ while(gameover==0){
         i=i+1;
         j=1;
     }
+    system("pause");
+    system("cls");
 }
 }

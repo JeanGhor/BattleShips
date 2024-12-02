@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "Medium.c"
+#include "Hard.c"
+#include "easy.c"
 int main(){
 srand(time(NULL));
 char difficulty[5];
@@ -23,10 +26,17 @@ else{
     int level;
     printf("How smart do you want your enemy to be? (Level 1, 2, or 3)\n");
     scanf("%d", &level);
-    if(level==2){
+    if(level==1)
+    {
+        easyBot(difficulty);
+    }
+    else if(level==2){
         medium(difficult);
     }
-  
+    else if(level==3)
+    {
+        hardBot(difficulty);
+    }
 
 }
 }

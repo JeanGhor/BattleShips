@@ -1,5 +1,7 @@
 //Requires: Inputs should be in the form specified by the program
 //Effects: Leads a two player mode game guided step by step
+//Testing Startegy: every method called was tested individually,
+//Then the code was tested using a trial and error approach.(play until an error was found then correct it)
 void twoplayermode(int difficult){
 // Create a grid for each player
     int**grid1=(int**)malloc(10*sizeof(int));
