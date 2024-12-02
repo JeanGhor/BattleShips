@@ -1,113 +1,9 @@
-//Requires: the parameters should include the length of the boat, the array that stores the robot's boats and its grid
-//Effects: positions the boat in the robot's grid in a random location after checking it is right
-//Testing Strategy: We do not need to consider the possibility of the int boat being abnormal as we specify it
-//in the caller method. Same principle for Boats and grid, they are the responsability of the main method.
-void robot_position_boat(int boat, int**Boats, int**grid){
+#include <stdio.h>
+#include <stdbool.h>
 
- int row, col, d;
-    char direction;
-    int x;
-
-    do {
-        row = rand() % 9;
-        col = rand() % 9;
-        d = rand() % 2 + 1;
-        direction = (d == 1) ? 'h' : 'v';
-        x = robot_position_boat_helper(grid, col, row, direction, boat, Boats);
-    } while (x == 0);  
-}
-
-//Requires: nothing
-//Effects: helps the robot_position_ boat by returning 0 if the location chosen is not available, and returns 1 if it is (after positioning the boat)
-//Testing Strategy: To test this helper function, we try out of bounds coordinates, coordinates overlaping with other boats, as well as valid coordinates.
-//Everything else is the responsability of the caller method.
-int robot_position_boat_helper(int** grid, int col, int row, char direction, int boat, int** Boats)
-{
-    if(direction=='h' || direction=='H'){
-        for(int i=0; i<boat; i++){
-            if(col+i>=10){
-              
-                return 0;
-            }
-        }
-         for(int i=0; i<boat; i++){
-            if(grid[row][col+i]==1){
-              
-                return 0;
-            }
-        }
-        for(int i=0; i<boat; i++){
-        grid[row][col+i]=1;
-        Boats[boat - 2][i] = row * 10 + col + i;
-        }
-       
-        return 1;
-    }
-    else{
-        for(int i=0; i<boat; i++){
-            if(row+i>=10){
-           
-              return 0;   
-            }
-        }
-         for(int i=0; i<boat; i++){
-        
-            if(grid[row+i][col]==1){
-            
-              return 0;   
-            }
-        }
-        for(int i=0; i<boat; i++){
-            grid[row+i][col]=1;
-            Boats[boat - 2][i] = (row + i) * 10 + col;
-
-        }
-        
-        return 1;
-    }
-} 
-//Requires: the grid entered should be the opponent's grid, the boats array should be the current player's array
-//Effects:  returns, if a boat was sunk in the last play, the number of cells the boat is made of
-//Testing Strategy: To test hit or miss, we try first an empty grid. After checking the normal behavior, we try it with
-//a grid where one boat was hit, a grid where the last cell of a boat was hit and we try a grid where 
-//the last cell of 2 boats were hit.
-int hit_or_miss2(int** grid, int** Boats){
-    for (int i = 0; i < 4; i++){
-        for (int j = 0; j<i+2; j++){  
-            if(Boats[i][j]>=0)
-            {
-                if (grid[Boats[i][j] / 10][Boats[i][j] % 10] == 2)
-                    Boats[i][j] = -1;
-            }   
-        }
-    }
-    int sunk = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        int count = 0;
-        for (int j = 0; j < i + 2; j++)
-        {
-            if (Boats[i][j] == -1)
-                count++;
-        }
-        if (count == i + 2)
-        {
-            sunk++;
-            for (int j = 0; j < i + 2; j++){
-                Boats[i][j] = -2;
-            }
-            return count;
-        }
-    }
-    return 0;
-}
 //Requires: the grid entered should be the one of the player currently entering his boats
 //Effects: prints a 10x10 grid with ~ for empty regions and * for regions with boats
-//Testing Strategy: Since the grid size is set by the programmer, we do not need to account
-//for out of bounds error, we need however to check it's behavior for a grid with empty cells
-//and hit regions.
-void printgrid(int ** grid)
-{
+void printgrid(int** grid){
     printf("\n    ");
     for (int i=0; i<10; i++)
         {
@@ -141,14 +37,10 @@ void printgrid(int ** grid)
     printf("\n");
 }
 
-
-
 //Requires: nothing
 //Effects: returns 0 if the location is not available 
 //and returns 1 if the operation is successful (turns the corresponding cells'value to 1 in the player's grid)
-//Testing startegy: Check for out of bounds error, collisions with other boats, and normal behavior
-int position_boat(int** grid, int col, int row, char direction, int boat, int** Boats)
-{
+int position_boat(int** grid, int col, int row, char direction, int boat, int** Boats){
     if(direction=='h' || direction=='H'){
         for(int i=0; i<boat; i++){
             if(col+i> (int)'K'-(int)'A'){
@@ -187,15 +79,12 @@ int position_boat(int** grid, int col, int row, char direction, int boat, int** 
         }
         return 1;
     }
-} 
-
+}
 
 //Requires: the boat should be a string of the boat's name and cells should be the number of cells the boat needs to fit
 //Effects: Prints a message to ask the corresponding player to insert the location of the corresponding boat
 //and keeps calling the position_boat method until the location entered is right
-//Testing Strategy: Only check normal behavior, everything else is the Caller's responsability
-void addboat(char*boat, int cells, int**grid, int** Boats)
-{
+void addboat(char*boat, int cells, int**grid, int** Boats){
     printf("\nEnter the first position of your %s (%d cells) and its direction \n(eg: B3, horizontal): ", boat, cells);
     char input[50];
     char * ptr=input;
@@ -238,10 +127,193 @@ void addboat(char*boat, int cells, int**grid, int** Boats)
     printgrid(grid);
 }
 
+//Requires: the grid entered should be the opponent's grid to check if the current player has won
+//Effects: returns 0 if the player did not win yet and returns 1 if the player has sunk all the opponent's boats
+int check_win(int**grid)
+{
+    for (int i = 0; i < 10; i++) 
+    {
+        for (int j = 0; j < 10; j++) 
+        {
+            if (grid[i][j] == 1 || grid[i][j] == 4) 
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+//Requires: the grid entered should be the opponent's grid 
+//the difficulty should be set at 1 for hard mode and 0 for easy mode
+//Effects: prints the grid showing * for hits and o as misses for the easy mode
+//does not show misses in hard mode
+//does not show outcome if the cell was hidden by smoke screen
+void print_opponent_grid(int**grid, int difficult){
+    printf("\n    ");
+    for (int i=0; i<10; i++)
+    {
+        printf("%c   ", (char)(65+i));
+    }
+    for(int i=1; i<10; i++)
+    {
+        printf("\n%d   ", i);
+        for(int j=0; j<10; j++)
+        {
+            if(grid[i-1][j]==0||grid[i-1][j]==1||grid[i-1][j]==4)
+            {
+                printf("~   ");
+            }
+            else if(grid[i-1][j]==2)
+            {
+                printf("*   ");
+            }
+            else if(grid[i-1][j]==3)
+            {
+                if(difficult==0)
+                {
+                    printf("o   ");
+                }
+                else
+                {
+                    printf("~   ");
+                }
+            }
+        }
+    }
+    printf("\n%d  ", 10);
+    for(int j=0; j<10; j++)
+    {
+        if(grid[9][j]==0||grid[9][j]==1||grid[9][j]==4)
+        {
+            printf("~   ");
+        }
+        else if(grid[9][j]==2)
+        {
+            printf("*   ");
+        }
+        else if(grid[9][j]==3)
+        {
+            if(difficult==0)
+            {
+                printf("o   ");
+            }
+            else
+            {
+                printf("~   ");
+            }
+        }
+    }
+    printf("\n");
+}
+
+//Requires: the grid entered should be the opponent's one while the boats array should be the current player's
+//Effects: returns the number of boats sunk
+int hit_or_miss(int** grid, int** Boats){
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j<i+2; j++){  
+            if(Boats[i][j]>=0)
+            {
+                if (grid[Boats[i][j] / 10][Boats[i][j] % 10] == 2)
+                    Boats[i][j] = -1;
+            }   
+        }
+    }
+    int sunk = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        int count = 0;
+        for (int j = 0; j < i + 2; j++)
+        {
+            if (Boats[i][j] == -1)
+                count++;
+        }
+        if (count == i + 2)
+        {
+            sunk++;
+            for (int j = 0; j < i + 2; j++){
+                Boats[i][j] = -2;
+            }
+        }
+    }
+    return sunk;
+}
+
+//Requires: the grid entered should be the opponent's grid, the boats array should be the current player's array
+//Effects:  returns, if a boat was sunk in the last play, the number of cells the boat is made of
+int hit_or_miss2(int** grid, int** Boats){
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j<i+2; j++){  
+            if(Boats[i][j]>=0)
+            {
+                if (grid[Boats[i][j] / 10][Boats[i][j] % 10] == 2)
+                    Boats[i][j] = -1;
+            }   
+        }
+    }
+    int sunk = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        int count = 0;
+        for (int j = 0; j < i + 2; j++)
+        {
+            if (Boats[i][j] == -1)
+                count++;
+        }
+        if (count == i + 2)
+        {
+            sunk++;
+            for (int j = 0; j < i + 2; j++){
+                Boats[i][j] = -2;
+            }
+            return count;
+        }
+    }
+    return 0;
+}
+
+int hit_or_miss3(int** grid, int** Boats,int* weapons){
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j<i+2; j++){  
+            if(Boats[i][j]>=0)
+            {
+                if (grid[Boats[i][j] / 10][Boats[i][j] % 10] == 2)
+                    Boats[i][j] = -1;
+            }   
+        }
+    }
+    int sunk = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        int count = 0;
+        for (int j = 0; j < i + 2; j++)
+        {
+            if (Boats[i][j] == -1)
+                count++;
+        }
+        if (count == i + 2)
+        {
+            sunk++;
+            for (int j = 0; j < i + 2; j++){
+                Boats[i][j] = -2;
+            }
+        }
+        if(sunk)
+        {
+            weapons[1]++;
+            weapons[2]++;
+            weapons[3]++;
+        }
+        else
+        {
+            weapons[2]=0;
+        }
+    }
+    return sunk;
+}
+
 //Requires: the steps printed on the console should be followed just as stated
 //Effects: scans the user's input, calls the corresponding method to perform the move and prints the move's outcome
-//Testing Strategy: Check with different difficulty levels, normal behavior, trying to use a weapon without the right to use it,
-//wrong input and out of bounds input.
 void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char*player){
     char String[100];
     char w;
@@ -313,8 +385,7 @@ void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char
             c1 = String[size - 3];
             row = 9;
         }
-        else
-        {
+        else{
             c1 = String[size - 2];
             c2 = String[size - 1];
             row = (int)(c2) - (int)('1');
@@ -379,126 +450,9 @@ void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char
     printf("\nNext player turn...");
 }
 
-//Requires: the grid entered should be the opponent's grid to check if the current player has won
-//Effects: returns 0 if the player did not win yet and returns 1 if the player has sunk all the opponent's boats
-//Testing strategy: test with a grid that won and one that didn't.
-int check_win(int**grid)
-{
-    for (int i = 0; i < 10; i++) 
-    {
-        for (int j = 0; j < 10; j++) 
-        {
-            if (grid[i][j] == 1 || grid[i][j] == 4) 
-            {
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-//Requires: the grid entered should be the opponent's grid 
-//the difficulty should be set at 1 for hard mode and 0 for easy mode
-//Effects: prints the grid showing * for hits and o as misses for the easy mode
-//does not show misses in hard mode
-//does not show outcome if the cell was hidden by smoke screen
-//Testing strategy: Pass a grid that has every element possible (misses, hits, undiscoverd, undiscovered with a boat, and smokescreen)
-//with both difficulties.
-void print_opponent_grid(int**grid, int difficult){
-    printf("\n    ");
-    for (int i=0; i<10; i++)
-    {
-        printf("%c   ", (char)(65+i));
-    }
-    for(int i=1; i<10; i++)
-    {
-        printf("\n%d   ", i);
-        for(int j=0; j<10; j++)
-        {
-            if(grid[i-1][j]==0||grid[i-1][j]==1||grid[i-1][j]==4)
-            {
-                printf("~   ");
-            }
-            else if(grid[i-1][j]==2)
-            {
-                printf("*   ");
-            }
-            else if(grid[i-1][j]==3)
-            {
-                if(difficult==0)
-                {
-                    printf("o   ");
-                }
-                else
-                {
-                    printf("~   ");
-                }
-            }
-        }
-    }
-    printf("\n%d  ", 10);
-    for(int j=0; j<10; j++)
-    {
-        if(grid[9][j]==0||grid[9][j]==1||grid[9][j]==4)
-        {
-            printf("~   ");
-        }
-        else if(grid[9][j]==2)
-        {
-            printf("*   ");
-        }
-        else if(grid[9][j]==3)
-        {
-            if(difficult==0)
-            {
-                printf("o   ");
-            }
-            else
-            {
-                printf("~   ");
-            }
-        }
-    }
-    printf("\n");
-}
-
-
-//Requires: the grid entered should be the opponent's one while the boats array should be the current player's
-//Effects: returns the number of boats sunk
-//Testing strategy: Use a grid who didn't hit boat, one that did hit a bot, one that sunk a boat and one 
-//that sunk more than one bloat
-int hit_or_miss(int** grid, int** Boats){
-    for (int i = 0; i < 4; i++){
-        for (int j = 0; j<i+2; j++){  
-            if(Boats[i][j]>=0)
-            {
-                if (grid[Boats[i][j] / 10][Boats[i][j] % 10] == 2)
-                    Boats[i][j] = -1;
-            }   
-        }
-    }
-    int sunk = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        int count = 0;
-        for (int j = 0; j < i + 2; j++)
-        {
-            if (Boats[i][j] == -1)
-                count++;
-        }
-        if (count == i + 2)
-        {
-            sunk++;
-            for (int j = 0; j < i + 2; j++){
-                Boats[i][j] = -2;
-            }
-        }
-    }
-    return sunk;
-}
-//Requires: The pTable After its calculation with calculateProb, and a pointer
-//Effect: returns the index of the cell that contains the highest probability through the index pointer
-
+//Requires: the parameters should be the opponent's probability table 
+//and an array storing the indices of the cell with highest probability of containing a ship
+//Effects: updates the array with new indices of the next cell with highest probabilty
 void highestProb(int** pTable, int* index){
     int maxi = pTable[0][0];
     for(int i = 0; i < 10; i++){
@@ -512,9 +466,9 @@ void highestProb(int** pTable, int* index){
         }
     }
 }
-//Requires: 2 grids, the boat grid of the ennemy(grid), and a grid to fill up(pTable)
-//Effects: Calculates how much boats can fit inside each cell of the pTable.
-//Testing strategy: start by trying to calculate the pTable of an empty grid, then add misses and hits to test it's normal behaviior
+
+//Requires: the probability table and the grid entered should be the opponent's ones
+//Effects: fills the probability table with the probability of containing a ship for each cell
 int calculateProb(int** pTable,int** grid)
 {
     for (int i = 0; i < 10; i++)
@@ -559,8 +513,6 @@ int calculateProb(int** pTable,int** grid)
         }
     }
 }
-//Requires: an integer between 0 and 7 and a 2D array
-//Effects: returns specific places to place boats through the templates array
 
 void SetUp(int x, int** templates){// !!!!!!!!this function's array should be plased in the main!!!!!!!!!!{
     if (x == 0){
@@ -676,10 +628,55 @@ void SetUp(int x, int** templates){// !!!!!!!!this function's array should be pl
         templates[3][2] = 0;   
     }
 }
-//Requires: the parameters should include the length of the boat, the array that stores the robot's boats and its grid and the choosen template's boat position
-//Effects: positions the boat in the robot's grid in at predefined coordinates depending on the template
-//Testing Strategy: We do not need to consider the possibility of the int boat being abnormal as we specify it
-//in the caller method. Same principle for Boats and grid, they are the responsability of the main method.
+
+//Requires: nothing
+//Effects: helps the robot_position_ boat by returning 0 if the location chosen is not available, and returns 1 if it is (after positioning the boat)
+int robot_position_boat_helper(int** grid, int col, int row, char direction, int boat, int** Boats)
+{
+    if(direction=='h' || direction=='H'){
+        for(int i=0; i<boat; i++){
+            if(col+i>=10){
+              
+                return 0;
+            }
+        }
+         for(int i=0; i<boat; i++){
+            if(grid[row][col+i]==1){
+              
+                return 0;
+            }
+        }
+        for(int i=0; i<boat; i++){
+        grid[row][col+i]=1;
+        Boats[boat - 2][i] = row * 10 + col + i;
+        }
+       
+        return 1;
+    }
+    else{
+        for(int i=0; i<boat; i++){
+            if(row+i>=10){
+           
+              return 0;   
+            }
+        }
+         for(int i=0; i<boat; i++){
+        
+            if(grid[row+i][col]==1){
+            
+              return 0;   
+            }
+        }
+        for(int i=0; i<boat; i++){
+            grid[row+i][col]=1;
+            Boats[boat - 2][i] = (row + i) * 10 + col;
+
+        }
+        
+        return 1;
+    }
+}
+
 void robot_position_boat_hard(int boat, int**Boats, int**grid, int *chosen){
     int col = chosen[0];
     int row = chosen[1];
@@ -687,52 +684,158 @@ void robot_position_boat_hard(int boat, int**Boats, int**grid, int *chosen){
     int x=0;
     while (x == 0)
     {
-        x = robot_position_boat_hard_helper(grid, col, row, direction, boat, Boats);
+        x = robot_position_boat_helper(grid, col, row, direction, boat, Boats);
     }   
 }
+
+//Requires: the parameters should include the length of the boat, the array that stores the robot's boats and its grid
+//Effects: positions the boat in the robot's grid in a random location after checking it is right
+void robot_position_boat(int boat, int**Boats, int**grid){
+
+ int row, col, d;
+    char direction;
+    int x;
+
+    do {
+        row = rand() % 9;
+        col = rand() % 9;
+        d = rand() % 2 + 1;
+        direction = (d == 1) ? 'h' : 'v';
+        x = robot_position_boat_helper(grid, col, row, direction, boat, Boats);
+    } while (x == 0);  
+}
+
 //Requires: nothing
-//Effects: helps the robot_position_boat_hard by returning 0 if the location chosen is not available, and returns 1 if it is (after positioning the boat)
-//Testing Strategy: To test this helper function, we try out of bounds coordinates, coordinates overlaping with other boats, as well as valid coordinates.
-//Everything else is the responsability of the caller method.
-int robot_position_boat_hard_helper(int** grid, int col, int row, char direction, int boat, int** Boats){
-    if(direction=='h' || direction=='H'){
-        for(int i=0; i<boat; i++){
-            if(col+i>=10){     
-                return 0;
-            }
-        }
-        for(int i=0; i<boat; i++){
-            if(grid[row][col+i]==1){
-                return 0;
-            }
-        }
-        for(int i=0; i<boat; i++){
-            grid[row][col+i]=1;
-            Boats[boat - 2][i] = row * 10 + col + i;
-        }
+//Effects: returns true if the coordinate is within the grid's boundaries and false if not
+bool isInBounds(int i, int j) {
+    return (i >= 0 && i < 10 && j >= 0 && j < 10);
+}
+
+//Requires: nothing
+//Effects: returns 0 if the indicated cell was not hiding a boat(changes the corresponding cell's value to 3), 
+//returns 1 if the indicated cell did have a boat(changes the corresponding cell's value to 2)
+int FireBot(int** Grid, int row, int col){
+    if (Grid[row][col] == 1 || Grid[row][col] == 2 || Grid[row][col] == 4) //Check if it contains a boat at this position
+    {
+        printf("hit\n");
+        Grid[row][col] = 2; //shot and hits a boat
         return 1;
     }
     else{
-        for(int i=0; i<boat; i++){
-            if(row+i>=10){
-              return 0;   
-            }
-        }
-        for(int i=0; i<boat; i++)
-        {
-            if(grid[row+i][col]==1)
-            {
-                return 0;   
-            }
-        }
-        for(int i=0; i<boat; i++)
-        {
-            grid[row+i][col]=1;
-            Boats[boat - 2][i] = (row + i) * 10 + col;
-        }
-        return 1;
+        printf("miss\n");
+        Grid[row][col] = 3; //shot and miss a boat
+        return 0;
     }
 }
 
+//Requires: the grid entered should be the opponent's grid while the
+//array of weapons entered should belong to the current player
+//found array should be a 4x2 array
+//Effects: reveals whether there are opponent ships in a 2x2 grid starting by the cell entered
+//returns 0 if we did not find any hidden boats that are not hidden by smokescreen
+//returns 1 if we found boats that are not hidden by smokescreen, save the 2x2 grid's
+//coordinates in the found 2D array
+int RadarSweepBot(int** Grid, int weapons[], int row, int col,int**found){
+    weapons[0]--; //uses the weapons
+    if(Grid[row][col]==1||Grid[row][col+1]==1||Grid[row+1][col]==1||Grid[row+1][col+1]==1){ //checks if a ship is found
+        printf("Enemy ships found!\n");//tells the use a ship has been spotted
+        return 1;
+    }
+    else
+    {
+        printf("No enemy ships found.\n");
+        return 0;
+    }
+}
 
+//Requires: the grid entered should be the opponent's grid while the
+//array of weapons entered should belong to the current player
+//Effects: hides the hits of a 2x2 area by turning the corresponding cells' values to 4 in the grid
+int SmokeScreenBot(int** Grid, int* weapons, int row, int col){
+    weapons[1]--;
+    for(int i = 0 ; i < 2 ; i++){
+        for (int j = 0 ; j < 2 ; j++) {
+            if(Grid[row+i][col+j]==1){
+                    Grid[row+i][col+j]=4; // changes the tile to hide it from radar sweep
+            }
+        }
+    }
+}
 
+//Requires: the grid entered should be the opponent's grid while the
+//array of weapons entered should belong to the current player
+//Effects: fires in a 2x2 grid starting by the cell entered
+//returns 0 if we did not find a boat (all cell become 3)
+// returns 1 if the 2x2 area housed a boat (changes the boat's cell to 2 and the others to 3)
+int ArtilleryBot(int** Grid, int weapons[], int row, int col){
+    int hit = 0 ; 
+    for(int i = 0 ; i < 2 ; i++)
+        {
+            for (int j = 0 ; j < 2 ; j++)
+            {
+                if(Grid[row+i][col+j]==1 || Grid[row+i][col+j]==4 || Grid[row+i][col+j]==2)
+                {
+                    Grid[row+i][col+j]=2; 
+                    hit=1;
+                }
+                if (Grid[row+i][col+j]==0)
+                    Grid[row+i][col+j]=3;
+            }
+        }
+    if(hit)
+        {
+            printf("hit\n");
+            return 1;
+        }
+    else
+        {
+            printf("miss\n");
+            return 0;
+        }
+}
+
+//Requires: the grid entered should be the opponent's grid while the
+//array of weapons entered should belong to the current player
+//the isrow should be entered as 1 if the target is a row and 0 if it is a column
+//Effects: hits a whole row or column 
+//returns 0 if we did not hit a hidden boat cell
+//returns 1 if we hit a hidden boat cell
+int TorpedoBot(int** Grid, int weapons[], int isrow, int roworcolumn){
+    int count = 0; //we will us it to check if they hit a boat
+    if(isrow)
+    { //The row "roworcolumn" will be hit
+        for(int i = 0; i < 10; i++)
+        {
+            if (Grid[roworcolumn][i] == 1 || Grid[roworcolumn][i] == 4)
+            { //checks if there is a boat in this row
+                Grid[roworcolumn][i] = 2; //shot and hits a boat
+                count++;
+            }
+            else
+                Grid[roworcolumn][i] = 3; //shot and miss a boat
+            }
+    }
+    else
+    { //The column "roworcolumn" will be hit
+        for(int i = 0; i < 10; i++)
+        {
+            if (Grid[i][roworcolumn] == 1 || Grid[i][roworcolumn] == 4)
+            { //checks if there is a boat in this column
+                Grid[i][roworcolumn] = 2; //shot and hit a boat
+                count++;
+            }
+            else
+                Grid[i][roworcolumn] = 3; //shot and miss a boat
+        }
+    }
+    if (count > 0) //check if it hit a boat
+    {
+        printf("hit\n");
+        return 1;
+    }
+    else
+    {
+        printf("miss\n");
+        return 0;
+    }
+}
