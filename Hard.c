@@ -2,31 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "Fire.c"
-#include "RadarSweep.c"
-#include "SmokeScreen.c"
-#include "Artillery.c"
-#include "Torpedo.c"
-
-void printgrid(int** grid);
-int position_boat(int** grid, int col, int row, char direction, int boat, int** Boats);
-void addboat(char*boat, int cells, int**grid, int** Boats);
-int check_win(int**grid);
-void print_opponent_grid(int**grid, int difficult);
-int hit_or_miss(int** grid, int** Boats);
-void play(int** grid, int**fgrid, int* weapons, int** Boats, int difficult, char*player);
-void highestProb(int** pTable, int* index);
-int calculateProb(int** pTable,int** grid);
-void SetUp(int x, int** templates);
-void robot_position_boat_hard(int boat, int**Boats, int**grid,int *chosen);
-int robot_position_boat_hard_helper(int** grid, int col, int row, char direction, int boat, int** Boats);
-bool isInBounds(int i, int j);
-int FireBot(int** Grid, int row, int col);
-int ArtilleryBot(int** Grid, int weapons[], int row, int col);
-int SmokeScreenBot(int** Grid, int* weapons, int row, int col);
-int TorpedoBot(int** Grid, int weapons[], int isrow, int roworcolumn);
-int RadarSweepBot(int** Grid, int weapons[], int row, int col,int**found);
-
+#include <Methods.c>
+#include <weapons.c>
 
 void hardBot (int difficult){
     int weapons1[] = {3, 0, 0, 0};
