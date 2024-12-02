@@ -107,8 +107,8 @@ void twoplayermode(int difficult){
     addboat("battleship", 4, grid2, Boats2);
     addboat("destroyer", 3, grid2, Boats2);
     addboat("submarine", 2, grid2, Boats2);
-    //system("pause");
-    //system("cls");
+    system("pause");
+    system("cls");
 
     int weapons1[] = {3, 0, 0, 0};
     int weapons2[] = {3, 0, 0, 0};
